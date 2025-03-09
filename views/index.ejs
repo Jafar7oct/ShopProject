@@ -102,27 +102,13 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const searchForm = document.getElementById('searchForm');
-            const searchInput = document.getElementById('searchInput');
-            const products = document.querySelectorAll('.product');
             const cartButtons = document.querySelectorAll('.add-to-cart');
             const cartCount = document.getElementById('cartCount');
-            let count = parseInt(cartCount.textContent) || 0;
-
-            // Client-side search (fallback)
-            searchForm.addEventListener('submit', (e) => {
-                if (!e.submitter) { // Prevent client-side filtering if form submits to server
-                    e.preventDefault();
-                    const query = searchInput.value.toLowerCase();
-                    products.forEach(product => {
-                        const productName = product.getAttribute('data-name').toLowerCase();
-                        product.style.display = productName.includes(query) ? 'block' : 'none';
-                    });
-                }
-            });
 
             // Add to cart
             cartButtons.forEach(button => {
-                button.addEventListener('click', async () => {
+                button.addEventListener('click', async (e) => {
+                    e.preventDefault();
                     const productId = button.getAttribute('data-product-id');
                     const productName = button.parentElement.querySelector('h3').textContent;
                     try {
@@ -132,8 +118,8 @@
                             body: JSON.stringify({ productId })
                         });
                         if (response.ok) {
-                            count++;
-                            cartCount.textContent = count;
+                            const data = await response.json();
+                            cartCount.textContent = data.cartCount;
                             alert(`Added ${productName} to cart!`);
                         } else {
                             alert('Failed to add to cart.');
