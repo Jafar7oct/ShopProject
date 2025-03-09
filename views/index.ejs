@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electronic Shop</title>
+    <style>
+        body { margin: 0; font-family: Arial, sans-serif; background-color: #F9FAFB; }
+        header { background-color: #1E3A8A; color: #ffffff; padding: 15px 20px; text-align: center; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        header button { margin: 5px; font-size: 1.5em; padding-left: 20px; text-align: left; background: none; border: none; color: #ffffff; cursor: pointer; transition: color 0.3s ease; }
+        header button:hover { color: #3B82F6; }
+        .header-buttons { display: flex; flex-wrap: wrap; gap: 10px; }
+        .header-buttons button { background: #3B82F6; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s ease, transform 0.2s ease; }
+        .header-buttons button:hover { background-color: #1E3A8A; transform: scale(1.05); }
+        .search-bar { margin: 20px auto; text-align: center; }
+        .search-bar input[type="text"] { padding: 12px; width: 320px; border: 2px solid #3B82F6; border-radius: 5px; font-size: 1em; transition: border-color 0.3s ease, box-shadow 0.3s ease; }
+        .search-bar input[type="text"]:focus { border-color: #1E3A8A; box-shadow: 0 0 8px rgba(30, 58, 138, 0.5); outline: none; }
+        .search-bar input[type="submit"] { padding: 12px 25px; background-color: #3B82F6; color: #ffffff; border: none; border-radius: 5px; cursor: pointer; font-size: 1em; transition: background-color 0.3s ease, transform 0.2s ease; }
+        .search-bar input[type="submit"]:hover { background-color: #1E3A8A; transform: scale(1.05); }
+        .products { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; padding: 40px 20px; max-width: 1080px; margin: 0 auto; }
+        .product { width: 280px; height: 420px; border: 1px solid #3B82F6; padding: 20px; text-align: center; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease, box-shadow 0.3s ease; display: flex; flex-direction: column; justify-content: space-between; }
+        .product:hover { transform: scale(1.05); box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); }
+        .product img { width: 240px; height: 240px; object-fit: cover; border-radius: 5px; margin: 0 auto 20px auto; }
+        .product h3 { margin: 0 0 10px 0; color: #1E3A8A; font-size: 1.2em; height: 40px; display: flex; align-items: center; justify-content: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .product p { color: #3B82F6; font-weight: bold; font-size: 1.1em; margin: 0 0 15px 0; height: 20px; display: flex; align-items: center; justify-content: center; }
+        .product button { padding: 10px 15px; background-color: #3B82F6; color: #ffffff; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s ease; margin-top: auto; }
+        .product button:hover { background-color: #1E3A8A; }
+        .cart-counter { text-align: center; padding: 10px; font-size: 1.1em; color: #1E3A8A; }
+        footer { background-color: #1E3A8A; color: #ffffff; text-align: center; padding: 10px; position: fixed; bottom: 0; width: 100%; box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1); font-size: 0.9em; }
+        footer a { color: #ffffff; margin: 0 10px; text-decoration: none; transition: color 0.3s ease; }
+        footer a:hover { color: #3B82F6; }
+        .flash { text-align: center; padding: 10px; margin: 10px auto; width: 50%; border-radius: 5px; }
+        .flash.success { background-color: #d4edda; color: #155724; }
+        .flash.error { background-color: #f8d7da; color: #721c24; }
+        @media (max-width: 600px) {
+            .product { width: 90%; max-width: 280px; height: auto; padding: 15px; }
+            .product img { width: 100%; height: 200px; margin: 0 auto 15px auto; }
+            .product button { padding: 8px 15px; }
+            .header-buttons { justify-content: center; width: 100%; }
+            .search-bar input[type="text"] { width: 80%; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <button onclick="window.location.href='/'" aria-label="Home">Electronic Shop</button>
+        <div class="header-buttons">
+            <% if (username) { %>
+                <% if (username === 'admin') { %>
+                    <button onclick="window.location.href='/admin'" aria-label="Admin Panel">Admin Panel</button>
+                <% } %>
+                <button onclick="window.location.href='/logout'" aria-label="Log Out">Log Out</button>
+            <% } else { %>
+                <button onclick="window.location.href='/login'" aria-label="Log In">Log In</button>
+                <button onclick="window.location.href='/signup'" aria-label="Sign Up">Sign Up</button>
+            <% } %>
+        </div>
+    </header>
+
+    <% messages.forEach(message => { %>
+        <div class="flash <%= message.type %>"><%= message.text %></div>
+    <% }); %>
+
+    <div class="search-bar">
+        <form action="/search" method="GET" id="searchForm">
+            <input type="text" id="searchInput" name="q" placeholder="Search for products..." aria-label="Search products">
+            <input type="submit" value="Search" aria-label="Submit search">
+        </form>
+    </div>
+
+    <section class="products" id="productList">
+        <% laptops.forEach(laptop => { %>
+            <div class="product" data-name="<%= laptop.name %>">
+                <img src="<%= laptop.image_url %>" alt="<%= laptop.name %>">
+                <h3><%= laptop.name %></h3>
+                <p>$<%= laptop.price.toFixed(2) %></p>
+                <button class="add-to-cart" data-product-id="<%= laptop.id %>" aria-label="Add <%= laptop.name %> to cart">Add to Cart</button>
+            </div>
+        <% }); %>
+
+        <% phones.forEach(phone => { %>
+            <div class="product" data-name="<%= phone.name %>">
+                <img src="<%= phone.image_url %>" alt="<%= phone.name %>">
+                <h3><%= phone.name %></h3>
+                <p>$<%= phone.price.toFixed(2) %></p>
+                <button class="add-to-cart" data-product-id="<%= phone.id %>" aria-label="Add <%= phone.name %> to cart">Add to Cart</button>
+            </div>
+        <% }); %>
+    </section>
+
+    <div class="cart-counter">
+        Items in Cart: <span id="cartCount"><%= cartCount || 0 %></span>
+    </div>
+
+    <footer>
+        <p>Support: <a href="mailto:support@electronicshop.com">support@electronicshop.com</a> | +962 7783434321 | 
+            <a href="https://facebook.com" target="_blank" aria-label="Facebook">Facebook</a> 
+            <a href="https://twitter.com" target="_blank" aria-label="Twitter">Twitter</a>
+        </p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchForm = document.getElementById('searchForm');
+            const searchInput = document.getElementById('searchInput');
+            const products = document.querySelectorAll('.product');
+            const cartButtons = document.querySelectorAll('.add-to-cart');
+            const cartCount = document.getElementById('cartCount');
+            let count = parseInt(cartCount.textContent) || 0;
+
+            // Client-side search (fallback)
+            searchForm.addEventListener('submit', (e) => {
+                if (!e.submitter) { // Prevent client-side filtering if form submits to server
+                    e.preventDefault();
+                    const query = searchInput.value.toLowerCase();
+                    products.forEach(product => {
+                        const productName = product.getAttribute('data-name').toLowerCase();
+                        product.style.display = productName.includes(query) ? 'block' : 'none';
+                    });
+                }
+            });
+
+            // Add to cart
+            cartButtons.forEach(button => {
+                button.addEventListener('click', async () => {
+                    const productId = button.getAttribute('data-product-id');
+                    const productName = button.parentElement.querySelector('h3').textContent;
+                    try {
+                        const response = await fetch('/cart/add', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ productId })
+                        });
+                        if (response.ok) {
+                            count++;
+                            cartCount.textContent = count;
+                            alert(`Added ${productName} to cart!`);
+                        } else {
+                            alert('Failed to add to cart.');
+                        }
+                    } catch (error) {
+                        console.error('Error adding to cart:', error);
+                        alert('An error occurred.');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Electronic Shop</title>
+    <style>
+        body { margin: 0; font-family: Arial, sans-serif; background-color: #F9FAFB; }
+        header { background-color: #1E3A8A; color: #ffffff; padding: 15px 20px; text-align: center; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
+        header button { background: #3B82F6; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; color: #ffffff; transition: background-color 0.3s ease; }
+        header button:hover { background-color: #1E3A8A; }
+        .container { max-width: 1200px; margin: 40px auto; padding: 20px; }
+        h1 { color: #1E3A8A; text-align: center; }
+        .flash { text-align: center; padding: 10px; margin: 10px 0; width: 50%; margin-left: auto; margin-right: auto; border-radius: 5px; }
+        .flash.success { background-color: #d4edda; color: #155724; }
+        .flash.error { background-color: #f8d7da; color: #721c24; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; border: 1px solid #3B82F6; text-align: center; }
+        th { background-color: #3B82F6; color: #ffffff; }
+        form { display: inline; }
+        input[type="number"] { width: 80px; padding: 5px; }
+        input[type="text"] { width: 150px; padding: 5px; }
+        button { padding: 8px 15px; background-color: #3B82F6; color: #ffffff; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s ease; }
+        button:hover { background-color: #1E3A8A; }
+        .add-form { margin-bottom: 20px; text-align: center; }
+        .add-form input { margin: 5px; }
+    </style>
+</head>
+<body>
+    <header>
+        <button onclick="window.location.href='/'">Back to Shop</button>
+    </header>
+
+    <div class="container">
+        <h1>Admin Panel - Manage Products</h1>
+
+        <% messages.forEach(message => { %>
+            <div class="flash <%= message.type %>"><%= message.text %></div>
+        <% }); %>
+
+        <!-- Add Product Form -->
+        <div class="add-form">
+            <form action="/admin/add" method="POST">
+                <input type="text" name="name" placeholder="Product Name" required>
+                <input type="number" name="price" placeholder="Price" step="0.01" required>
+                <input type="text" name="category" placeholder="Category" required>
+                <input type="text" name="image_url" placeholder="Image URL" required>
+                <button type="submit">Add Product</button>
+            </form>
+        </div>
+
+        <!-- Product List -->
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Category</th>
+                    <th>Image URL</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% products.forEach(product => { %>
+                    <tr>
+                        <td><%= product.id %></td>
+                        <td><%= product.name %></td>
+                        <td>
+                            <form action="/admin/edit/<%= product.id %>" method="POST">
+                                <input type="number" name="price" value="<%= product.price %>" step="0.01" required>
+                                <button type="submit">Update</button>
+                            </form>
+                        </td>
+                        <td><%= product.category %></td>
+                        <td><%= product.image_url %></td>
+                        <td>
+                            <form action="/admin/delete/<%= product.id %>" method="POST">
+                                <button type="submit">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
